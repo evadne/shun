@@ -10,7 +10,8 @@ defmodule Shun.Builder.AddressTest do
     accept %URI{host: "localhost"}
     reject "192.168.1.1"
     reject {169, x, _, _} when x == 254
-    accept {_, _, _, _}
+    accept {127,0,0,1}
+    reject {_,_,_,_}
 
     reject {_, _, _, _, _, _, _, _}
   end

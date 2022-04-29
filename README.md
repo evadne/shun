@@ -24,7 +24,7 @@ To install Shun, add the following line in your application’s dependencies:
 
     defp deps do
       [
-        {:shun, "~> 1.0.0"}
+        {:shun, "~> 1.0.1"}
       ]
     end
 

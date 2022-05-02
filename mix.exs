@@ -4,7 +4,7 @@ defmodule Shun.MixProject do
   def project do
     [
       app: :shun,
-      version: "1.0.1",
+      version: "1.0.2",
       elixir: "~> 1.9",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: Mix.compilers(),
@@ -37,7 +37,7 @@ defmodule Shun.MixProject do
   defp deps do
     [
       {:dialyxir, "~> 1.1.0", only: [:dev, :test], runtime: false},
-      {:ex_doc, "~> 0.24.0", only: [:dev, :test], runtime: false}
+      {:ex_doc, "~> 0.24.0", only: [:dev, :test], runtime:  false}
     ]
   end
 
@@ -60,6 +60,7 @@ defmodule Shun.MixProject do
   defp package_files do
     ~w(
       lib/shun/*
+      lib/shun.ex
       mix.exs
       .formatter.exs
     )

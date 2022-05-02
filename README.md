@@ -22,35 +22,43 @@ Within the DSL, each Rule must have a Target. Additionaly, guards and handlers a
 
 To install Shun, add the following line in your application’s dependencies:
 
-    defp deps do
-      [
-        {:shun, "~> 1.0.2"}
-      ]
-    end
+```elixir
+defp deps do
+  [
+    {:shun, "~> 1.0.2"}
+  ]
+end
+```
 
 ## Usage
 
 The usual way to use `Shun.Builder` is by installing it in a custom module.
 
-    defmodule MyApp.Shun do
-      use Shun.Builder
-      handle Shun.Preset.IPv6.Embedded
-      reject Shun.Preset.AWS.InstanceMetadata
-    end
+```elixir
+defmodule MyApp.Shun do
+  use Shun.Builder
+  handle Shun.Preset.IPv6.Embedded
+  reject Shun.Preset.AWS.InstanceMetadata
+end
+```
 
 Additional Rules can be added using a simple DSL (provided by `Shun.Rule`):
 
-    defmodule MyApp.Shun do
-      use Shun.Builder
-      handle Shun.Preset.IPv6.Embedded
-      reject Shun.Preset.AWS.InstanceMetadata
-      reject "10.0.0.0/8"
-      reject %URI{scheme: scheme} when scheme != "https"
-    end
+```elixir
+defmodule MyApp.Shun do
+  use Shun.Builder
+  handle Shun.Preset.IPv6.Embedded
+  reject Shun.Preset.AWS.InstanceMetadata
+  reject "10.0.0.0/8"
+  reject %URI{scheme: scheme} when scheme != "https"
+end
+```
 
 Afterwards, you can call `Shun.verify/2`, for example:
 
+```elixir
     Shun.verify(MyApp.Shun, "http://google.com")
+```
 
 ## Presets
 
@@ -68,75 +76,85 @@ These Presets provide reject rules that can be plugged into your own Shun provid
 
 You can use presets with the `accept`, `reject` or `handle` macros, for example:
 
-    reject Shun.Preset.IPv4.LinkLocal # rejects link-local ipv4 addresses
-    reject Shun.Preset.AWS.InstanceMetadata # rejects 169.254.169.254
-    handle Shun.Preset.IPv6.Embedded # handles underlying IPv4
-    reject Shun.Preset.IPv6.Embedded # rejects all embedded IPv4
+```elixir
+reject Shun.Preset.IPv4.LinkLocal # rejects link-local ipv4 addresses
+reject Shun.Preset.AWS.InstanceMetadata # rejects 169.254.169.254
+handle Shun.Preset.IPv6.Embedded # handles underlying IPv4
+reject Shun.Preset.IPv6.Embedded # rejects all embedded IPv4
+```
 
 ## Scenarios
 
 To accept URLs as long as they do not resolve to undesired IPs:
 
-    defmodule MyApp.Shun do
-      use Shun.Builder
-      # reject <preset>
-      accept {_, _, _, _}
-      accept {_, _, _, _, _, _, _, _}
-      # Note that a default action for URIs is not provided - this forces all
-      # URIs to be resolved, so IP rules in presets are exercised
-    end
+```elixir
+defmodule MyApp.Shun do
+  use Shun.Builder
+  # reject <preset>
+  accept {_, _, _, _}
+  accept {_, _, _, _, _, _, _, _}
+  # Note that a default action for URIs is not provided - this forces all
+  # URIs to be resolved, so IP rules in presets are exercised
+end
+```
 
 To only accept a few specific URIs:
 
-    defmodule MyApp.Shun do
-      use Shun.Builder
-      accept %URI{host: "example.com"}
-      accept %URI{host: "special.example.com"}
-      reject %URI{} 
-      reject {_, _, _, _}
-      reject {_, _, _, _, _, _, _, _}
-    end
+```elixir
+defmodule MyApp.Shun do
+  use Shun.Builder
+  accept %URI{host: "example.com"}
+  accept %URI{host: "special.example.com"}
+  reject %URI{} 
+  reject {_, _, _, _}
+  reject {_, _, _, _, _, _, _, _}
+end
+```
 
 To use a function to decide what to do with the URI:
 
-    defmodule MyApp.Shun do
-      use Shun.Builder
-      reject %URI{scheme: scheme} when scheme != "https"
-      handle %URI{}, &handle_uri/1
-      
-      defp handle_uri(uri) do
-        cond do
-          uri.host == "dynamic.example.com" -> :reject
-          true -> :accept
-        end
-      end
+```elixir
+defmodule MyApp.Shun do
+  use Shun.Builder
+  reject %URI{scheme: scheme} when scheme != "https"
+  handle %URI{}, &handle_uri/1
+
+  defp handle_uri(uri) do
+    cond do
+      uri.host == "dynamic.example.com" -> :reject
+      true -> :accept
     end
+  end
+end
+```
 
 To only allow URIs from a specific AWS S3 bucket (in virtual hosted-style):
 
-    defmodule MyApp.Shun do
-      use Shun.Builder
-      reject %URI{scheme: scheme} when scheme != "https"
-      handle %URI{}, &handle_uri/1
-      
-      defp handle_uri(%{host: host}) do
-        bucket_name = System.get_env("AWS_BUCKET_NAME")
-        region_name = System.get_env("AWS_REGION")
-        
-        names = [
-          "#{bucket_name}.s3-accelerate.dualstack.amazonaws.com",
-          "#{bucket_name}.s3-accelerate.amazonaws.com",
-          "#{bucket_name}.s3.dualstack.#{region_name}.amazonaws.com",
-          "#{bucket-name}.s3.#{region_name}.amazonaws.com",
-          "#{bucket-name}.s3.amazonaws.com"
-        ]
-        
-        cond do
-          Enum.member?(names, host) -> :accept
-          true -> :reject
-        end
-      end
+```elixir
+defmodule MyApp.Shun do
+  use Shun.Builder
+  reject %URI{scheme: scheme} when scheme != "https"
+  handle %URI{}, &handle_uri/1
+
+  defp handle_uri(%{host: host}) do
+    bucket_name = System.get_env("AWS_BUCKET_NAME")
+    region_name = System.get_env("AWS_REGION")
+
+    names = [
+      "#{bucket_name}.s3-accelerate.dualstack.amazonaws.com",
+      "#{bucket_name}.s3-accelerate.amazonaws.com",
+      "#{bucket_name}.s3.dualstack.#{region_name}.amazonaws.com",
+      "#{bucket-name}.s3.#{region_name}.amazonaws.com",
+      "#{bucket-name}.s3.amazonaws.com"
+    ]
+
+    cond do
+      Enum.member?(names, host) -> :accept
+      true -> :reject
     end
+  end
+end
+```
 
 ## Notes
 
@@ -166,3 +184,4 @@ The author wishes to additionally thank the following individuals for their inpu
 - [Alvise Susmel](https://github.com/alvises)
 - [Derek Kraan](https://github.com/derekkraan)
 - [Bryan Hunt](https://github.com/mergefailure)
+g

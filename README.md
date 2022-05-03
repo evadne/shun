@@ -57,7 +57,7 @@ end
 Afterwards, you can call `Shun.verify/2`, for example:
 
 ```elixir
-    Shun.verify(MyApp.Shun, "http://google.com")
+Shun.verify(MyApp.Shun, "http://google.com")
 ```
 
 ## Presets

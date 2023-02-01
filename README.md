@@ -6,7 +6,7 @@ The Shun library provides URI, IPv4 and IPv6 address verification primitives for
 
 The Shun library provides a way to easily add domain / address verification to your application. It operates based on a set of Rules that are compiled into your custom module, but you are also able to inject function references where needed, to affect the decisions dynamically.
 
-Within the DSL, each Rule must have a Target. Additionaly, guards and handlers are optionally available.
+Within the DSL, each Rule must have a Target. Additionally, guards and handlers are optionally available.
 
 -  There are three types of Rules: Accept, Reject and Handle. The first two kinds are self-explanatory; the third kind allows you to specify a function reference, so your application can dynamically decide what to do with a Target.
 
@@ -179,7 +179,7 @@ During design and prototype development of this library, the Author has drawn in
 - [c-rack/cidr-elixir](https://github.com/c-rack/cidr-elixir)
 - [cobenian/inet_cidr](https://github.com/Cobenian/inet_cidr)
 
-The author wishes to additionally thank the following individuals for their input during the implemention process:
+The author wishes to additionally thank the following individuals for their input during the implementation process:
 
 - [Alvise Susmel](https://github.com/alvises)
 - [Derek Kraan](https://github.com/derekkraan)

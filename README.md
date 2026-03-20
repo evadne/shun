@@ -184,3 +184,4 @@ The author wishes to additionally thank the following individuals for their inpu
 - [Alvise Susmel](https://github.com/alvises)
 - [Derek Kraan](https://github.com/derekkraan)
 - [Bryan Hunt](https://github.com/mergefailure)
+- [Stefan Lapers](https://github.com/slapers)

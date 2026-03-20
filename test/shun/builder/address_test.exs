@@ -1,6 +1,17 @@
 defmodule Shun.Builder.AddressTest do
   use ExUnit.Case, async: true
 
+  defmodule FakeResolver do
+    @behaviour Shun.Resolver
+
+    @impl Shun.Resolver
+    def resolve("safe.test", _timeout), do: {:ok, [{93, 184, 216, 34}]}
+
+    def resolve("private.test", _timeout), do: {:ok, [{192, 168, 1, 1}]}
+
+    def resolve(_host, _timeout), do: :error
+  end
+
   defmodule AddressVerifier do
     use Shun.Builder
     reject Shun.Preset.AWS.InstanceMetadata
@@ -35,12 +46,12 @@ defmodule Shun.Builder.AddressTest do
     end
 
     test "rejects 127.0.0.1" do
-      {:ok, address} = :inet.parse_address('127.0.0.1')
+      {:ok, address} = :inet.parse_address(~c"127.0.0.1")
       assert :reject = AddressVerifier.verify_ip(address)
     end
 
     test "rejects ::ffff:127.0.0.1 as boxed value, despite blanket IPv6 acceptance" do
-      {:ok, address} = :inet.parse_address('::ffff:127.0.0.1')
+      {:ok, address} = :inet.parse_address(~c"::ffff:127.0.0.1")
       assert {:dynamic, fun} = AddressVerifier.verify_ip(address)
       assert {:verify_ip, address} = fun.(address)
       assert :reject = AddressVerifier.verify_ip(address)
@@ -54,6 +65,18 @@ defmodule Shun.Builder.AddressTest do
 
     test "rejects 192.168.1.1" do
       assert {:error, :rejected} = Shun.verify(AddressVerifier, "https://192.168.1.1")
+    end
+  end
+
+  describe "Shun.verify/3 with a custom resolver" do
+    test "accepts hostnames that resolve to public addresses" do
+      assert {:ok, [{93, 184, 216, 34}]} =
+               Shun.verify(AddressVerifier, "https://safe.test", resolver: FakeResolver)
+    end
+
+    test "rejects hostnames that resolve to private addresses" do
+      assert {:error, :rejected} =
+               Shun.verify(AddressVerifier, "https://private.test", resolver: FakeResolver)
     end
   end
 end

@@ -103,12 +103,14 @@ defmodule Shun.Verifier do
     end
   end
 
-  defp verify_ips(provider, addresses, options) do
-    case Enum.uniq(Enum.map(addresses, &verify_ip(provider, &1, options))) do
-      [:accept] -> {:ok, addresses}
-      _ -> {:error, :rejected}
+  defp verify_ips(provider, [_ | _] = addresses, options) do
+    case Enum.all?(addresses, &match?({:ok, _}, verify_ip(provider, &1, options))) do
+      true -> {:ok, addresses}
+      false -> {:error, :rejected}
     end
   end
+
+  defp verify_ips(_, _, _), do: {:error, :rejected}
 
   defp get_option(options, key), do: Keyword.get_lazy(options, key, fn -> get_default(key) end)
   defp get_default(:resolver), do: Shun.Resolver.InetRes

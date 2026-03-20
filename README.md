@@ -25,7 +25,7 @@ To install Shun, add the following line in your application’s dependencies:
 ```elixir
 defp deps do
   [
-    {:shun, "~> 1.0.2"}
+    {:shun, "~> 1.0.3"}
   ]
 end
 ```

@@ -4,7 +4,7 @@ defmodule Shun.MixProject do
   def project do
     [
       app: :shun,
-      version: "1.0.2",
+      version: "1.0.3",
       elixir: "~> 1.9",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: Mix.compilers(),

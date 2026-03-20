@@ -16,7 +16,7 @@ defmodule Shun.Address do
 
   @spec parse(String.t()) :: {:ok, result_ipv4 | result_ipv6} | :error
 
-  use Bitwise
+  import Bitwise
   defguard is_v4(value) when is_tuple(value) and tuple_size(value) == 4
   defguard is_v6(value) when is_tuple(value) and tuple_size(value) == 8
 

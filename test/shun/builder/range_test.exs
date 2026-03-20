@@ -22,7 +22,7 @@ defmodule Shun.Builder.RangeTest do
     end
 
     test "identifies ::ffff:127.0.0.1 as boxed value" do
-      {:ok, address} = :inet.parse_address('::ffff:127.0.0.1')
+      {:ok, address} = :inet.parse_address(~c"::ffff:127.0.0.1")
       assert {:dynamic, fun} = RangeVerifier.verify_ip(address)
       assert {:verify_ip, address} = fun.(address)
       assert :accept = RangeVerifier.verify_ip(address)
